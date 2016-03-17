@@ -36,13 +36,47 @@ var Game = {
 
     updateDelay++;
 
+    if (cursors.up.isDown) {
+      if(direction !== 'down'){
+        new_direction = 'up';
+      }
+    }
+    else if (cursors.down.isDown) {
+      if(direction !== 'up'){
+        new_direction = 'down';
+      }
+    }
+    else if (cursors.left.isDown) {
+      if(direction !== 'right'){
+        new_direction = 'left';
+      }
+    }
+    else if (cursors.right.isDown) {
+      if(direction !== 'left'){
+        new_direction = 'right';
+      }
+    }
+
+    game.debug.text( direction, 100, 380 );
+
+
+
     if(updateDelay >= 10)
     {
       updateDelay = 0;
+
+      if(new_direction)
+      {
+        direction = new_direction;
+        new_direction = null;
+      }
+
+
       var firstCell = snake[snake.length - 1];
       var lastCell = snake.shift();
       var oldX = lastCell.x;
       var oldY = lastCell.Y;
+
 
       if(direction == 'right')
       {
@@ -65,52 +99,38 @@ var Game = {
         lastCell.y = firstCell.y + 15;
       }
 
-      if(lastCell.x <= 0 || lastCell.x >= 600 || lastCell.y <= 0 || lastCell.y >= 450)
+
+      firstCell = lastCell
+      snake.push(firstCell);
+      //if add new is true
+      if(addNew)
+      {
+        snake.unshift(game.add.sprite(oldX,oldY,'snake'));
+        addNew = false;
+      }
+
+
+      //collision stuff
+      if(firstCell.x < 0 || firstCell.x > 600 || firstCell.y < 0 || firstCell.y > 450)
       {
         game.state.start('Game_over');
       }
 
-      for (var i = 1; i < snake.length; i++) {
-          if(snake[i].x === lastCell.x && snake[i].y === lastCell.y)
+      for (var i = 0; i < snake.length-1; i++) {
+          if(snake[i].x === firstCell.x && snake[i].y === firstCell.y)
           {
             game.state.start('Game_over');
           }
       }
 
-      if(lastCell.x == apple.x && lastCell.y === apple.y){
+      if(firstCell.x === apple.x && firstCell.y === apple.y){
+        addNew = true;
         apple.destroy();
-        snake.unshift(game.add.sprite(oldX,oldY,'snake'));
-
         this.generateApple();
       }
 
-      snake.push(lastCell);
-    }
 
-
-
-    if (cursors.up.isDown) {
-      if(direction !== 'down'){
-        direction = 'up';
-      }
     }
-    else if (cursors.down.isDown) {
-      if(direction !== 'up'){
-        direction = 'down';
-      }
-    }
-    else if (cursors.left.isDown) {
-      if(direction !== 'right'){
-        direction = 'left';
-      }
-    }
-    else if (cursors.right.isDown) {
-      if(direction !== 'left'){
-        direction = 'right';
-      }
-    }
-
-    game.debug.text( direction, 100, 380 );
   },
 
   generateApple: function(){
