@@ -9,6 +9,6 @@ var Game_over = {
   },
 
   restartGame: function(){
-    game.state.start('Game');
+    game.state.start('Game2');
   }
 };

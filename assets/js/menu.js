@@ -8,6 +8,6 @@ var Menu = {
   },
 
   startGame: function(){
-    game.state.start('Game');
+    game.state.start('Game2');
   }
 };

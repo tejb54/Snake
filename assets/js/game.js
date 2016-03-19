@@ -18,6 +18,13 @@ var Game = {
     updateDelay = 0;
     direction = 'right';
     new_direction = null;
+    score = 0;
+
+    scoreTextValue = game.add.text(10,10, "Score: " + score,{font: "24px Arial",
+      fill: "#00c4ff",
+      align: "center"
+    });
+
 
     cursors = game.input.keyboard.createCursorKeys();
 
@@ -56,10 +63,6 @@ var Game = {
         new_direction = 'right';
       }
     }
-
-    game.debug.text( direction, 100, 380 );
-
-
 
     if(updateDelay >= 10)
     {
@@ -102,12 +105,7 @@ var Game = {
 
       firstCell = lastCell
       snake.push(firstCell);
-      //if add new is true
-      if(addNew)
-      {
-        snake.unshift(game.add.sprite(oldX,oldY,'snake'));
-        addNew = false;
-      }
+
 
 
       //collision stuff
@@ -125,17 +123,23 @@ var Game = {
 
       if(firstCell.x === apple.x && firstCell.y === apple.y){
         addNew = true;
+        score++;
+        scoreTextValue.setText("Score: " + score);
+
         apple.destroy();
         this.generateApple();
       }
-
-
+    }
+    if(addNew)
+    {
+      snake.unshift(game.add.sprite(oldX,oldY,'snake'));
+      addNew = false;
     }
   },
 
   generateApple: function(){
     var randomX = Math.floor(Math.random() * 40 ) * squareSize,
-            randomY = Math.floor(Math.random() * 30 ) * squareSize;
+        randomY = Math.floor(Math.random() * 30 ) * squareSize;
 
         // Add a new apple.
         apple = game.add.sprite(randomX, randomY, 'apple');
