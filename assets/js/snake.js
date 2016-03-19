@@ -1,10 +1,15 @@
-function snakeObj(){
+function snakeObj(apple, callback, callbackApple){
 
   this.snakeParts = [];
   this.direction = 'right';
   this.new_direction = null;
   this.cursors = game.input.keyboard.createCursorKeys();
   this.timer = 0;
+  this.apple = apple;
+  this.callback = callback;
+  this.callbackApple = callbackApple;
+  this.speed = 0;
+  this.numberOfApplesCollected = 0;
 
   this.preload = function(){
     game.load.image('snakeObj',"./assets/images/snake.png");
@@ -22,7 +27,7 @@ function snakeObj(){
 
     //timer used to slow the game down
     this.timer++;
-    if(this.timer >= 10){
+    if(this.timer >= (10 - this.speed)){
       this.timer = 0;
 
       //move the snake
@@ -31,7 +36,6 @@ function snakeObj(){
       //check collision for this snake
       this.collision();
     }
-
   };
 
   this.checkInput = function(){
@@ -66,28 +70,29 @@ function snakeObj(){
       this.new_direction = null;
     }
 
-    var firstCell = this.snakeParts[this.snakeParts.length -1];
+    this.firstCell = this.snakeParts[this.snakeParts.length - 1];
     var lastCell = this.snakeParts.shift();
 
     if(this.direction == 'right')
     {
-      lastCell.x = firstCell.x +15;
-      lastCell.y = firstCell.y;
+      lastCell.x = this.firstCell.x +15;
+      lastCell.y = this.firstCell.y;
     }
     else if (this.direction == 'left') {
-      lastCell.x = firstCell.x - 15;
-      lastCell.y = firstCell.y;
+      lastCell.x = this.firstCell.x - 15;
+      lastCell.y = this.firstCell.y;
     }
     else if (this.direction == 'up') {
-      lastCell.x = firstCell.x;
-      lastCell.y = firstCell.y -15;
+      lastCell.x = this.firstCell.x;
+      lastCell.y = this.firstCell.y -15;
     }
     else if (this.direction == 'down') {
-      lastCell.x = firstCell.x;
-      lastCell.y = firstCell.y +15;
+      lastCell.x = this.firstCell.x;
+      lastCell.y = this.firstCell.y +15;
     }
 
     this.snakeParts.push(lastCell);
+    this.firstCell = lastCell;
 
   };
 
@@ -98,8 +103,41 @@ function snakeObj(){
     for (var i = 0; i < this.snakeParts.length -1; i++) {
       if(head.x == this.snakeParts[i].x && head.y == this.snakeParts[i].y)
       {
-        game.state.start('Game_over');
+        this.callback();
       }
+    }
+
+    //collision with walls
+    if(head.x < 0 || head.x >= 600 || head.y < 0 || head.y >= 450)
+    {
+      if(head.x < 0){
+        head.x = 600;
+      }
+      else if(head.x >= 600) {
+        head.x = 0;
+      }
+      else if (head.y < 0) {
+        head.y = 450;
+      }
+      else if (head.y >= 450) {
+        head.y = 0;
+      }
+    }
+
+    //collision with apple
+    if(head.x == this.apple.sprite.x && head.y == this.apple.sprite.y)
+    {
+      if(this.numberOfApplesCollected%2 == 0)
+      {
+        this.snakeParts.unshift(game.add.sprite(this.firstCell.x,this.firstCell.y,'snakeObj'));
+      }
+
+
+      this.callbackApple();
+      this.numberOfApplesCollected++;
+      this.speed = Math.floor(this.numberOfApplesCollected/5);
+
+      this.apple.generateApple();
     }
 
   };

@@ -7,7 +7,6 @@ game = new Phaser.Game(600, 450, Phaser.AUTO, '');
 // Second parameter is an object containing the needed methods for state functionality
 game.state.add('Menu', Menu);
 game.state.add('Game', Game);
-game.state.add('Game2', Game2);
 game.state.add('Game_over',Game_over);
 
 game.state.start('Menu');
